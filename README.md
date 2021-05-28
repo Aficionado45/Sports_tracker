@@ -25,7 +25,7 @@
 3. Video to be stored in format "clubname_name_taskname.mp4" in "Tasks" folder.
      ![8](https://user-images.githubusercontent.com/61295782/119982823-f3449300-bfdc-11eb-9fd8-2e5a18cee246.png)
 
-4. Functions left to implement: Debug Upload, Points table already retrieved and stored after sorting      into a map just listing it to the screen is left.     
+4. Functions left to implement: Debug Upload, Points table already retrieved and stored after sorting into a map with total points of all club just listing it to the screen is   left.     
 5. Theme.dart file not updated yet, you can take color hex code from screens itself.     
         
 
