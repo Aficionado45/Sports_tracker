@@ -94,5 +94,3 @@ class _ResetScreenState extends State<ResetScreen> {
         ));
   }
 }
-
-//Tasks: Improve UI
