@@ -2,10 +2,10 @@
 
            Add admin screen method to main file andd remove comment tag.
 ![1](https://user-images.githubusercontent.com/61295782/119981382-300f8a80-bfdb-11eb-83dd-1e772c6ec02f.png)
-
+ 
         Import all the admin screens with their navigation tags to the main file as shown above.
  ![2](https://user-images.githubusercontent.com/61295782/119981504-5503fd80-bfdb-11eb-8993-dd53c083e15d.png)
-
+ 
         Remove comment tag from login_screen with correct navigation tag.
         ![3](https://user-images.githubusercontent.com/61295782/119981703-8da3d700-bfdb-11eb-8ae7-d9b647cdaca0.png)
 2. Points to consider for firebase console:
