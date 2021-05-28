@@ -144,7 +144,3 @@ class _LeaderboardState extends State<Leaderboard> {
         ));
   }
 }
-
-// Store points from each task of each club in a map then perform operation to
-// add up points for each particualr club and sort accordingly then using list view
-// print them on the screen.
