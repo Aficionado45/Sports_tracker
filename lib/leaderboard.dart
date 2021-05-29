@@ -81,66 +81,69 @@ class _LeaderboardState extends State<Leaderboard> {
                 stops: [0.0, 1.0],
                 tileMode: TileMode.repeated)),
         child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Column(children: [
-            Row(
-              children: [
+            backgroundColor: Colors.transparent,
+            body: SingleChildScrollView(
+              child: Column(children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 80,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'home');
+                      },
+                      child: const Text("HOME"),
+                      style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          textStyle: TextStyle(fontSize: 16)),
+                    ),
+                    Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'leader');
+                      },
+                      child: const Text("LEADERBOARDS"),
+                      style: TextButton.styleFrom(
+                          primary: Color(0XFFD3C48D),
+                          textStyle: TextStyle(fontSize: 16)),
+                    ),
+                    SizedBox(
+                      width: 30,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _auth.signOut();
+                        Navigator.pushNamed(context, 'login');
+                      },
+                      child: const Text("LOGOUT"),
+                      style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 16)),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                  ],
+                ),
                 SizedBox(
-                  width: 20,
-                  height: 80,
+                  height: 40,
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'home');
-                  },
-                  child: const Text("HOME"),
-                  style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      textStyle: TextStyle(fontSize: 16)),
+                Text(
+                  "LEADERBOARDS",
+                  style: TextStyle(color: Color(0XFFD3C48D), fontSize: 40),
                 ),
-                Spacer(),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'leader');
-                  },
-                  child: const Text("LEADERBOARDS"),
-                  style: TextButton.styleFrom(
-                      primary: Color(0XFFD3C48D),
-                      textStyle: TextStyle(fontSize: 16)),
+                Container(
+                  height: 550,
+                  width: MediaQuery.of(context).size.width / 1.1,
+                  decoration: BoxDecoration(
+                      color: Color(0xFF1C1F1E),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
                 ),
-                SizedBox(
-                  width: 30,
-                ),
-                TextButton(
-                  onPressed: () {
-                    _auth.signOut();
-                    Navigator.pushNamed(context, 'login');
-                  },
-                  child: const Text("LOGOUT"),
-                  style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      textStyle: TextStyle(color: Colors.white, fontSize: 16)),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            Text(
-              "LEADERBOARDS",
-              style: TextStyle(color: Color(0XFFD3C48D), fontSize: 40),
-            ),
-            Container(
-              height: 550,
-              width: MediaQuery.of(context).size.width / 1.1,
-              decoration: BoxDecoration(
-                  color: Color(0xFF1C1F1E),
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-            ),
-          ]),
-        ));
+                SizedBox(height: 10),
+              ]),
+            )));
   }
 }

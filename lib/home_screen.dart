@@ -45,19 +45,20 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     final fileName = file != null ? basename(file.path) : 'No File Selected';
     return Container(
-      decoration: new BoxDecoration(
-          gradient: new LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [
-                Color.fromRGBO(0, 0, 0, 83),
-                Color.fromRGBO(0, 0, 0, 41),
-              ],
-              stops: [0.0, 1.0],
-              tileMode: TileMode.repeated)),
-      child: Scaffold(
+        decoration: new BoxDecoration(
+            gradient: new LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: [
+                  Color.fromRGBO(0, 0, 0, 83),
+                  Color.fromRGBO(0, 0, 0, 41),
+                ],
+                stops: [0.0, 1.0],
+                tileMode: TileMode.repeated)),
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: Column(
+          body: SingleChildScrollView(
+              child: Column(
             children: [
               Row(
                 children: [
@@ -218,9 +219,10 @@ class _HomeState extends State<Home> {
                     color: Color(0xFF1C1F1E),
                     borderRadius: BorderRadius.all(Radius.circular(20))),
               ),
+              SizedBox(height: 10),
             ],
           )),
-    );
+        ));
   }
 
   Future selectFile() async {
