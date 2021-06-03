@@ -53,7 +53,7 @@ class _LoginState extends State<Login> {
                     Spacer(),
                     TextButton(
                       onPressed: () {
-                        //Navigator.pushNamed(context,'admin'); // Chnage the navigator path to admin console
+                        Navigator.pushNamed(context,'admin'); // Chnage the navigator path to admin console
                       },
                       child: const Text("ADMIN"),
                       style: TextButton.styleFrom(

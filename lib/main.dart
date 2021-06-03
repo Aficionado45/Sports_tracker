@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sports_web/ClubListScreen.dart';
+import 'package:sports_web/addUsers.dart';
+import 'package:sports_web/adminLogin.dart';
+import 'package:sports_web/auth_screen.dart';
+import 'package:sports_web/clubsVideo.dart';
 import 'package:sports_web/home_screen.dart';
 import 'package:sports_web/reset.dart';
 import 'login_screen.dart';
@@ -12,8 +17,15 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,7 +36,12 @@ class MyApp extends StatelessWidget {
         'home': (context) => Home(),
         'leader': (context) => Leaderboard(),
         'reset': (context) => ResetScreen(),
-        //'admin:(context) => AdminScreen(),
+        'admin':(context) => AuthScreen(),
+
+
+       //  'clubList':(context)=> ClubListScreen(),
+       // 'register':(context)=> AddUsers(),
+        //'clubsvideo':(context)=> ClubsVideo(),
       },
     );
   }
