@@ -15,7 +15,7 @@
    Add every allowed user to the firebase authentication.
    ![1](https://user-images.githubusercontent.com/61295782/119983648-0efc6900-bfde-11eb-8d56-709bb8079ca0.png)
 
-   Make sure the document id of user is same as it's uid and user doc fields to be "name" and "club"   necessary
+   Make sure the document id of user is same as it's uid and user doc fields to be "full_name" and "club_name"   necessary
    ![4](https://user-images.githubusercontent.com/61295782/119982292-45d17f80-bfdc-11eb-8419-aa4a49239d3e.png)
 ![5](https://user-images.githubusercontent.com/61295782/119982299-479b4300-bfdc-11eb-989d-ce5c74335863.png)
     Tasks to be uploaded with title "Task".
