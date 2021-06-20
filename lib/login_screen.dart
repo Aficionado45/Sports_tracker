@@ -199,7 +199,7 @@ class _LoginState extends State<Login> {
                   height: 5,
                 ),
                 Text(
-                  "Developed By: Varenya Tiwari, Karan Jain, Ayush Raj, Aayush Sachdeva",
+                  "Developed By: Varenya Tiwari,Karan Jain, Ayush Raj",
                   style: TextStyle(
                       fontWeight: FontWeight.w300,
                       color: Color(0X90D3C48D),

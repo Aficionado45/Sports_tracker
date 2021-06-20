@@ -35,11 +35,11 @@ class _HomeState extends State<Home> {
     getCurrentUser();
   }
 
-  void userdata() async {
+  Future<void> userdata() async {
     final uid = loggedInUser.uid;
     DocumentSnapshot ds = await userCollection.doc(uid).get();
-    name = ds.get('name');
-    club = ds.get('club');
+    name = ds.get('full_name');
+    club = ds.get('club_name');
   }
 
   Widget build(BuildContext context) {
@@ -126,13 +126,28 @@ class _HomeState extends State<Home> {
               SizedBox(
                 height: 10,
               ),
-              Text(
-                "Varenya Tiwari | Aquatics",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Color(0XFFD3C48D),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500),
+              Container(
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FutureBuilder(
+                      future: userdata(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done)
+                          return Text("Loading");
+                        return Text(
+                          "$name | $club",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color(0XFFD3C48D),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 height: 20,

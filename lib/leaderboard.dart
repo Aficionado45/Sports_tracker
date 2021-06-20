@@ -11,9 +11,25 @@ class Leaderboard extends StatefulWidget {
 }
 
 class _LeaderboardState extends State<Leaderboard> {
-  @override
   final _auth = FirebaseAuth.instance;
+  Map<String, dynamic> finalscore = {
+    "Squash": 0,
+    "Athletics": 0,
+    "Table Tennis": 0,
+    "Basketball": 0,
+    "Badminton": 0,
+    "Cricket": 0,
+    "Aquatics": 0,
+    "Hockey": 0,
+    "Tennis": 0,
+    "Football": 0,
+    "Volleyball": 0,
+    "Weightlifting": 0
+  };
+  LinkedHashMap sortedMap;
+  var sortedKeys;
   final firestoreInstance = FirebaseFirestore.instance;
+
   void getCurrentUser() async {
     try {
       final user = _auth.currentUser;
@@ -30,21 +46,7 @@ class _LeaderboardState extends State<Leaderboard> {
     getCurrentUser();
   }
 
-  Future<SplayTreeMap<String, dynamic>> aquatics_points() async {
-    Map<String, dynamic> finalscore = {
-      "Squash": 0,
-      "Athletics": 0,
-      "Table Tennis": 0,
-      "Basketball": 0,
-      "Badminton": 0,
-      "Cricket": 0,
-      "Aquatics": 0,
-      "Hockey": 0,
-      "Tennis": 0,
-      "Football": 0,
-      "Volleyball": 0,
-      "Weightlifting": 0
-    };
+  Future<void> points() async {
     var point = await firestoreInstance
         .collection("Points_table")
         .where("Aquatics", isGreaterThan: -1)
@@ -60,15 +62,20 @@ class _LeaderboardState extends State<Leaderboard> {
           }
         }
       });
-      var sortedByValue = new SplayTreeMap<String, dynamic>.from(finalscore,
-          (key1, key2) => finalscore[key1].compareTo(finalscore[key2]));
-      print(sortedByValue);
-      return sortedByValue;
+      var sortedKeys = finalscore.keys.toList(growable: false)
+        ..sort((k1, k2) => finalscore[k2].compareTo(finalscore[k1]));
+
+      Map<String, dynamic> sortedMap = new Map<String, dynamic>.fromIterable(
+          sortedKeys,
+          key: (k) => k,
+          value: (k) => finalscore[k]);
+
+      finalscore = sortedMap;
     });
   }
 
+  @override
   Widget build(BuildContext context) {
-    Future<SplayTreeMap<String, dynamic>> points = aquatics_points();
     return Container(
         decoration: new BoxDecoration(
             gradient: new LinearGradient(
@@ -135,13 +142,43 @@ class _LeaderboardState extends State<Leaderboard> {
                   "LEADERBOARDS",
                   style: TextStyle(color: Color(0XFFD3C48D), fontSize: 40),
                 ),
-                Container(
-                  height: 550,
-                  width: MediaQuery.of(context).size.width / 1.1,
-                  decoration: BoxDecoration(
-                      color: Color(0xFF1C1F1E),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                ),
+                FutureBuilder(
+                    future: points(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState != ConnectionState.done)
+                        return Text("Loading",
+                            style: TextStyle(
+                                color: Color(0XFFD3C48D), fontSize: 10));
+                      return Container(
+                        height: 550,
+                        width: MediaQuery.of(context).size.width / 1.1,
+                        child: new ListView.builder(
+                          itemCount: finalscore.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            index++;
+                            String key = finalscore.keys.elementAt(index - 1);
+
+                            return ListTile(
+                              leading: Text("$index",
+                                  style: TextStyle(
+                                      color: Color(0XFFD3C48D), fontSize: 20)),
+                              title: new Text("$key",
+                                  style: TextStyle(
+                                      color: Color(0XFFD3C48D), fontSize: 20)),
+                              trailing: new Text(
+                                "${finalscore[key]}",
+                                style: TextStyle(
+                                    color: Color(0XFFD3C48D), fontSize: 20),
+                              ),
+                            );
+                          },
+                        ),
+                        decoration: BoxDecoration(
+                            color: Color(0xFF1C1F1E),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                      );
+                    }),
                 SizedBox(height: 10),
               ]),
             )));
