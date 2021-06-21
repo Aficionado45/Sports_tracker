@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import 'ClubListScreen.dart';
+import 'package:sports_web/sharedPreference.dart';
 
 
 class AddUsers extends StatefulWidget {
@@ -15,7 +14,7 @@ class AddUsers extends StatefulWidget {
 class _AddUsersState extends State<AddUsers> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String name, email, password, clubName;
+  String name, email, password, clubName, errorMess="";
 
   Future signUpWithEmailAndPassword() async {
     try{
@@ -27,15 +26,21 @@ class _AddUsersState extends State<AddUsers> {
         print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
         print('The account already exists for that email.');
+        setState(() {
+          errorMess = 'Account already exists for that email.';
+        });
       }
     } catch (e){
       print(e.toString());
+      setState(() {
+        errorMess = 'Somethings went wrong!! please try again!!';
+      });
     }
   }
 
-  Future<void> RegisterMember() async{
-    return FirebaseFirestore.instance.collection('users')
-        .add(
+  Future<void> RegisterMember(String uid) async{
+    return FirebaseFirestore.instance.collection('users').doc(uid)
+        .set(
         {
           'full_name': name,
           'email': email,
@@ -96,7 +101,7 @@ class _AddUsersState extends State<AddUsers> {
                         ),
                         TextButton(
                           onPressed: () async {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
+                            Navigator.pushNamed(context, 'clubList');
                           },
                           child: const Text("HOME"),
                           style: TextButton.styleFrom(
@@ -106,7 +111,7 @@ class _AddUsersState extends State<AddUsers> {
                         Spacer(),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>AddUsers()));
+                            Navigator.pushNamed(context, 'register');
                           },
                           child: const Text("Add Users"),
                           style: TextButton.styleFrom(
@@ -118,8 +123,13 @@ class _AddUsersState extends State<AddUsers> {
                         ),
                         TextButton(
                           onPressed: () {
+                            setState(() {
+                              HelperFunctions.saveAdminAuthSharedPreference(false);
+                              HelperFunctions.saveUserLoggedInSharedPreference(false);
+                            });
+
                             _auth.signOut();
-                            Navigator.pushReplacementNamed(context, 'login');
+                            Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
                           },
                           child: const Text("LOGOUT"),
                           style: TextButton.styleFrom(
@@ -142,7 +152,14 @@ class _AddUsersState extends State<AddUsers> {
                         fontSize: 30,
                       ),
                     ),
-                    SizedBox(height: 30),
+                    SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12,),
+                      child: Text(errorMess, style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.red
+                      ),),
+                    ),
                     Container(
                       //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
                       height: 50,
@@ -295,17 +312,18 @@ class _AddUsersState extends State<AddUsers> {
                         onPressed: () async {
                             signUpWithEmailAndPassword().then((value) {
                               print("${value.uid}");
-                              RegisterMember();
-                              updateMembersCount();
+
                               if(value != null){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
+                                RegisterMember("${value.uid}");
+                                updateMembersCount();
+                                Navigator.pushNamed(context, 'clubList');
                               }
                             });
                         },
                       ),
                     ),
                     SizedBox(
-                      height: 170,
+                      height: 120,
                     ),
                     Text(
                       "Sports Board IITG",
