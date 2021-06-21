@@ -3,14 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:video_player/video_player.dart';
-import 'dart:io';
-import 'ClubListScreen.dart';
-import 'addUsers.dart';
-import 'utils/firebaseApi.dart';
-import 'package:path/path.dart';
+import 'package:sports_web/sharedPreference.dart';
+
 
 User loggedInUser;
 
@@ -33,7 +28,7 @@ class ClubsVideo extends StatefulWidget {
 
 class _ClubsVideoState extends State<ClubsVideo> {
   final _auth = FirebaseAuth.instance;
-  FirebaseStorage _storage = FirebaseStorage.instance;
+ // FirebaseStorage _storage = FirebaseStorage.instance;
   TextEditingController points = TextEditingController();
   String pts;
   String mem;
@@ -96,7 +91,7 @@ class _ClubsVideoState extends State<ClubsVideo> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
+                              Navigator.pushNamed(context, 'clubList');
                             },
                             child: const Text("HOME"),
                             style: TextButton.styleFrom(
@@ -106,7 +101,7 @@ class _ClubsVideoState extends State<ClubsVideo> {
                           Spacer(),
                           TextButton(
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>AddUsers()));
+                              Navigator.pushNamed(context, 'register');
                             },
                             child: const Text("Add Users"),
                             style: TextButton.styleFrom(
@@ -118,8 +113,13 @@ class _ClubsVideoState extends State<ClubsVideo> {
                           ),
                           TextButton(
                             onPressed: () {
+                              setState(() {
+                                HelperFunctions.saveAdminAuthSharedPreference(false);
+                                HelperFunctions.saveUserLoggedInSharedPreference(false);
+                              });
+
                               _auth.signOut();
-                              Navigator.pushReplacementNamed(context, 'login');
+                              Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
                             },
                             child: const Text("LOGOUT"),
                             style: TextButton.styleFrom(
@@ -241,66 +241,75 @@ class _ClubsVideoState extends State<ClubsVideo> {
                             borderRadius: BorderRadius.all(Radius.circular(20))),
                       ),
                       SizedBox(height: 30),
-                      Container(
-                        //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
-                        height: 50,
-                        width: MediaQuery.of(context).size.height / 1.8,
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.start,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          controller: points,
-                          decoration: InputDecoration(
-                            hintText: 'Enter points',
-                            hintStyle:
-                            TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding:
-                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFFE8E8E8)),
-                                borderRadius: BorderRadius.circular(10.0)),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(
-                        height: 10,
-                      ),
-                      const Text("Please assign points to club", style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFFE8E8E8),
-                      ),),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        child: RaisedButton(
-                          textColor: Colors.white,
-                          padding: const EdgeInsets.all(0.0),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(80.0)),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: <Color>[
-                                    Color(0xFF73DCDC),
-                                    Color(0xFFC11ADC),
-                                  ],
-                                ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(100.0))),
-                            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            child: const Text('Submit',
-                                style:
-                                TextStyle(color: Colors.white, fontSize: 16)),
-                          ),
-                          onPressed: () async {
-                            updatepoints(int.parse(points.text));
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
-                          },
-                        ),
+                      // Container(
+                      //   //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                      //   height: 50,
+                      //   width: MediaQuery.of(context).size.height / 1.8,
+                      //   child: TextField(
+                      //     keyboardType: TextInputType.number,
+                      //     textAlign: TextAlign.start,
+                      //     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      //     controller: points,
+                      //     decoration: InputDecoration(
+                      //       hintText: 'Enter points',
+                      //       hintStyle:
+                      //       TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
+                      //       filled: true,
+                      //       fillColor: Colors.white,
+                      //       contentPadding:
+                      //       EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                      //       border: OutlineInputBorder(
+                      //           borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+                      //           borderRadius: BorderRadius.circular(10.0)),
+                      //     ),
+                      //   ),
+                      // ),
+                      //
+                      // SizedBox(
+                      //   height: 10,
+                      // ),
+                      // const Text("Please assign points to club", style: TextStyle(
+                      //   fontSize: 16,
+                      //   color: Color(0xFFE8E8E8),
+                      // ),),
+                      // SizedBox(
+                      //   height: 10,
+                      // ),
+                      // Container(
+                      //   child: RaisedButton(
+                      //     textColor: Colors.white,
+                      //     padding: const EdgeInsets.all(0.0),
+                      //     shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(80.0)),
+                      //     child: Container(
+                      //       decoration: const BoxDecoration(
+                      //           gradient: LinearGradient(
+                      //             colors: <Color>[
+                      //               Color(0xFF73DCDC),
+                      //               Color(0xFFC11ADC),
+                      //             ],
+                      //           ),
+                      //           borderRadius:
+                      //           BorderRadius.all(Radius.circular(100.0))),
+                      //       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      //       child: const Text('Submit',
+                      //           style:
+                      //           TextStyle(color: Colors.white, fontSize: 16)),
+                      //     ),
+                      //     onPressed: () async {
+                      //       updatepoints(int.parse(points.text));
+                      //       Navigator.pushNamed(context, 'clubList');
+                      //     },
+                      //   ),
+                      // ),
+                      // SizedBox(height: 10),
+                      Text(
+                        "Developed By: Varenya Tiwari, Karan Jain, Ayush Raj, Aayush Sachdeva",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            color: Color(0X90D3C48D),
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic),
                       ),
                       SizedBox(height: 10),
                     ],

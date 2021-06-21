@@ -1,12 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:sports_web/addUsers.dart';
 import 'package:sports_web/clubsVideo.dart';
-import 'dart:io';
-import 'utils/firebaseApi.dart';
-import 'package:path/path.dart';
+import 'package:sports_web/sharedPreference.dart';
 
 User loggedInUser;
 
@@ -41,9 +37,6 @@ class _ClubListScreenState extends State<ClubListScreen> {
 
 
   Widget build(BuildContext context) {
-    // if(loggedInUser.uid != null){
-    //
-    // }
     return Stack(
       children: [
         Container(
@@ -81,7 +74,7 @@ class _ClubListScreenState extends State<ClubListScreen> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
+                              Navigator.pushNamed(context, 'clubList');
                             },
                             child: const Text("HOME"),
                             style: TextButton.styleFrom(
@@ -91,7 +84,7 @@ class _ClubListScreenState extends State<ClubListScreen> {
                           Spacer(),
                           TextButton(
                             onPressed: () {
-                             Navigator.push(context, MaterialPageRoute(builder: (context)=>AddUsers()));
+                             Navigator.pushNamed(context, 'register');
                             },
                             child: const Text("Add Users"),
                             style: TextButton.styleFrom(
@@ -103,8 +96,13 @@ class _ClubListScreenState extends State<ClubListScreen> {
                           ),
                           TextButton(
                             onPressed: () {
+                              setState(() {
+                                HelperFunctions.saveAdminAuthSharedPreference(false);
+                                HelperFunctions.saveUserLoggedInSharedPreference(false);
+                              });
+
                               _auth.signOut();
-                              Navigator.pushReplacementNamed(context, 'login');
+                              Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
                             },
                             child: const Text("LOGOUT"),
                             style: TextButton.styleFrom(
@@ -235,6 +233,15 @@ class _ClubListScreenState extends State<ClubListScreen> {
                         decoration: BoxDecoration(
                             color: Color(0xFF1C1F1E),
                             borderRadius: BorderRadius.all(Radius.circular(20))),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "Developed By: Varenya Tiwari, Karan Jain, Ayush Raj, Aayush Sachdeva",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            color: Color(0X90D3C48D),
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic),
                       ),
                       SizedBox(height: 10),
                     ],
