@@ -68,10 +68,10 @@ class _MyAppState extends State<MyApp> {
         'leader': (context) => Leaderboard(),
         'reset': (context) => ResetScreen(),
         'auth':(context) => AuthScreen(),
-        'admin':(context) => isUserAdmin?AdminLogin():NotFoundPage(),
+        'admin':(context) => AdminLogin(),
 
-        'clubList':(context)=> isUserAdmin && isLoggedIn?ClubListScreen():NotFoundPage(),
-       'register':(context)=> isUserAdmin && isLoggedIn?AddUsers():NotFoundPage(),
+        'clubList':(context)=>ClubListScreen(),
+       'register':(context)=>AddUsers(),
         //'clubsvideo':(context)=> ClubsVideo(),
       },
     );
