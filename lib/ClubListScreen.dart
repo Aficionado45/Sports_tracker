@@ -21,7 +21,8 @@ class _ClubListScreenState extends State<ClubListScreen> {
   bool isLoggedIn = false;
   final _auth = FirebaseAuth.instance;
   final userCollection = FirebaseFirestore.instance.collection("users");
-  String name, club, uid;
+
+
 
   getUserLog()async{
     await HelperFunctions.getAdminAuthSharedPreference().then((value) {
