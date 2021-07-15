@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import 'ClubListScreen.dart';
+import 'package:sports_web/errorPage.dart';
+import 'package:sports_web/sharedPreference.dart';
 
 
 class AddUsers extends StatefulWidget {
@@ -15,7 +15,26 @@ class AddUsers extends StatefulWidget {
 class _AddUsersState extends State<AddUsers> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String name, email, password, clubName;
+  String name, email, password, clubName, errorMess="";
+  bool isUserAdmin =false;
+  bool isLoggedIn = false;
+
+  getUserLog()async{
+    await HelperFunctions.getAdminAuthSharedPreference().then((value) {
+      if(value != null){
+        setState(() {
+          isUserAdmin =value;
+        });
+      }
+    });
+    await HelperFunctions.getUserLoggedInSharedPreference().then((value) {
+      if(value != null){
+        setState(() {
+          isLoggedIn = value;
+        });
+      }
+    });
+  }
 
   Future signUpWithEmailAndPassword() async {
     try{
@@ -27,15 +46,21 @@ class _AddUsersState extends State<AddUsers> {
         print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
         print('The account already exists for that email.');
+        setState(() {
+          errorMess = 'Account already exists for that email.';
+        });
       }
     } catch (e){
       print(e.toString());
+      setState(() {
+        errorMess = 'Somethings went wrong!! please try again!!';
+      });
     }
   }
 
-  Future<void> RegisterMember() async{
-    return FirebaseFirestore.instance.collection('users')
-        .add(
+  Future<void> RegisterMember(String uid) async{
+    return FirebaseFirestore.instance.collection('users').doc(uid)
+        .set(
         {
           'full_name': name,
           'email': email,
@@ -57,282 +82,301 @@ class _AddUsersState extends State<AddUsers> {
 
   void initState() {
     super.initState();
+    getUserLog();
   }
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('sports_ball.jpg'), fit: BoxFit.fill),
+    if(isUserAdmin && isLoggedIn){
+      return Stack(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('sports_ball.jpg'), fit: BoxFit.fill),
+            ),
           ),
-        ),
-        Container(
-          decoration: new BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [
-                    Color.fromRGBO(70, 75, 75, 88),
-                    Color.fromRGBO(0, 0, 0, 100),
-                  ],
-                  stops: [
-                    0.0,
-                    1.0
-                  ],
-                  begin: FractionalOffset.topCenter,
-                  end: FractionalOffset.bottomCenter,
-                  tileMode: TileMode.repeated)),
-          child: Scaffold(
-              backgroundColor: Colors.transparent,
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 80,
+          Container(
+            decoration: new BoxDecoration(
+                gradient: new LinearGradient(
+                    colors: [
+                      Color.fromRGBO(70, 75, 75, 88),
+                      Color.fromRGBO(0, 0, 0, 100),
+                    ],
+                    stops: [
+                      0.0,
+                      1.0
+                    ],
+                    begin: FractionalOffset.topCenter,
+                    end: FractionalOffset.bottomCenter,
+                    tileMode: TileMode.repeated)),
+            child: Scaffold(
+                backgroundColor: Colors.transparent,
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 80,
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.pushNamed(context, 'clubList');
+                            },
+                            child: const Text("HOME"),
+                            style: TextButton.styleFrom(
+                                primary: Colors.white,
+                                textStyle: TextStyle(fontSize: 16)),
+                          ),
+                          Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, 'register');
+                            },
+                            child: const Text("Add Users"),
+                            style: TextButton.styleFrom(
+                                primary: Color(0XFFD3C48D),
+                                textStyle: TextStyle(fontSize: 16)),
+                          ),
+                          SizedBox(
+                            width: 30,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                HelperFunctions.saveAdminAuthSharedPreference(false);
+                                HelperFunctions.saveUserLoggedInSharedPreference(false);
+                              });
+
+                              _auth.signOut();
+                              Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
+                            },
+                            child: const Text("LOGOUT"),
+                            style: TextButton.styleFrom(
+                                primary: Colors.white,
+                                textStyle:
+                                TextStyle(color: Colors.white, fontSize: 16)),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 150,
+                      ),
+                      Text(
+                        "Website Name",
+                        style: TextStyle(
+                          color: Color(0xFFFFFAFA),
+                          fontSize: 30,
                         ),
-                        TextButton(
+                      ),
+                      SizedBox(height: 15),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12,),
+                        child: Text(errorMess, style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.red
+                        ),),
+                      ),
+                      Container(
+                        //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                        height: 50,
+                        width: MediaQuery.of(context).size.height / 1.8,
+                        child: TextField(
+                          keyboardType: TextInputType.text,
+                          textAlign: TextAlign.start,
+                          onChanged: (value) {
+                            if (value.isEmpty)
+                              return Null;
+                            else {
+                              name = value;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Full Name',
+                            hintStyle:
+                            TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                        height: 50,
+                        width: MediaQuery.of(context).size.height / 1.8,
+                        child: TextField(
+                          keyboardType: TextInputType.emailAddress,
+                          textAlign: TextAlign.start,
+
+                          onChanged: (value) {
+                            if (value.isEmpty)
+                              return Null;
+                            else {
+                              email = value;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Email',
+                            hintStyle:
+                            TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                        height: 50,
+                        width: MediaQuery.of(context).size.height / 1.8,
+                        child: TextField(
+                          keyboardType: TextInputType.text,
+                          textAlign: TextAlign.start,
+                          onChanged: (value) {
+                            if (value.isEmpty)
+                              return Null;
+                            else {
+                              clubName = value;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Club Name',
+                            hintStyle:
+                            TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
+                        width: MediaQuery.of(context).size.height / 1.8,
+                        height: 50,
+                        child: TextField(
+                          obscureText: true,
+                          onChanged: (value) {
+                            if (value.isEmpty)
+                              return Null;
+                            else {
+                              password = value;
+                            }
+                          },
+
+                          keyboardType: TextInputType.emailAddress,
+                          textAlign: TextAlign.start,
+                          decoration: InputDecoration(
+                            hintText: 'Password',
+                            hintStyle:
+                            TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Color(0xFFE8E8E8)),
+                                borderRadius: BorderRadius.circular(10.0)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+
+                      Container(
+                        child: RaisedButton(
+                          textColor: Colors.white,
+                          padding: const EdgeInsets.all(0.0),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(80.0)),
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: <Color>[
+                                    Color(0xFF73DCDC),
+                                    Color(0xFFC11ADC),
+                                  ],
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(100.0))),
+                            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                            child: const Text('Register',
+                                style:
+                                TextStyle(color: Colors.white, fontSize: 16)),
+                          ),
                           onPressed: () async {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
-                          },
-                          child: const Text("HOME"),
-                          style: TextButton.styleFrom(
-                              primary: Colors.white,
-                              textStyle: TextStyle(fontSize: 16)),
-                        ),
-                        Spacer(),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>AddUsers()));
-                          },
-                          child: const Text("Add Users"),
-                          style: TextButton.styleFrom(
-                              primary: Color(0XFFD3C48D),
-                              textStyle: TextStyle(fontSize: 16)),
-                        ),
-                        SizedBox(
-                          width: 30,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            _auth.signOut();
-                            Navigator.pushReplacementNamed(context, 'login');
-                          },
-                          child: const Text("LOGOUT"),
-                          style: TextButton.styleFrom(
-                              primary: Colors.white,
-                              textStyle:
-                              TextStyle(color: Colors.white, fontSize: 16)),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 150,
-                    ),
-                    Text(
-                      "Website Name",
-                      style: TextStyle(
-                        color: Color(0xFFFFFAFA),
-                        fontSize: 30,
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    Container(
-                      //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
-                      height: 50,
-                      width: MediaQuery.of(context).size.height / 1.8,
-                      child: TextField(
-                        keyboardType: TextInputType.text,
-                        textAlign: TextAlign.start,
-                        onChanged: (value) {
-                          if (value.isEmpty)
-                            return Null;
-                          else {
-                            name = value;
-                          }
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Full Name',
-                          hintStyle:
-                          TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                          EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
-                      height: 50,
-                      width: MediaQuery.of(context).size.height / 1.8,
-                      child: TextField(
-                        keyboardType: TextInputType.emailAddress,
-                        textAlign: TextAlign.start,
-
-                        onChanged: (value) {
-                          if (value.isEmpty)
-                            return Null;
-                          else {
-                            email = value;
-                          }
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Email',
-                          hintStyle:
-                          TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                          EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
-                      height: 50,
-                      width: MediaQuery.of(context).size.height / 1.8,
-                      child: TextField(
-                        keyboardType: TextInputType.text,
-                        textAlign: TextAlign.start,
-                        onChanged: (value) {
-                          if (value.isEmpty)
-                            return Null;
-                          else {
-                            clubName = value;
-                          }
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Club Name',
-                          hintStyle:
-                          TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                          EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      //margin: EdgeInsets.fromLTRB(150, 0, 150, 0),
-                      width: MediaQuery.of(context).size.height / 1.8,
-                      height: 50,
-                      child: TextField(
-                        obscureText: true,
-                        onChanged: (value) {
-                          if (value.isEmpty)
-                            return Null;
-                          else {
-                            password = value;
-                          }
-                        },
-
-                        keyboardType: TextInputType.emailAddress,
-                        textAlign: TextAlign.start,
-                        decoration: InputDecoration(
-                          hintText: 'Password',
-                          hintStyle:
-                          TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                          EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFE8E8E8)),
-                              borderRadius: BorderRadius.circular(10.0)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-
-                    Container(
-                      child: RaisedButton(
-                        textColor: Colors.white,
-                        padding: const EdgeInsets.all(0.0),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(80.0)),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFF73DCDC),
-                                  Color(0xFFC11ADC),
-                                ],
-                              ),
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(100.0))),
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          child: const Text('Register',
-                              style:
-                              TextStyle(color: Colors.white, fontSize: 16)),
-                        ),
-                        onPressed: () async {
                             signUpWithEmailAndPassword().then((value) {
                               print("${value.uid}");
-                              RegisterMember();
-                              updateMembersCount();
+
                               if(value != null){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>ClubListScreen()));
+                                RegisterMember("${value.uid}");
+                                updateMembersCount();
+                                Navigator.pushNamed(context, 'clubList');
                               }
                             });
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 170,
-                    ),
-                    Text(
-                      "Sports Board IITG",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Color(0XFFD3C48D),
-                        fontSize: 20,
+                      SizedBox(
+                        height: 80,
                       ),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Developed By: Varenya Tiwari, Karan Jain, Ayush Raj, Aayush Sachdeva",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          color: Color(0X90D3C48D),
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic),
-                    ),
-                    SizedBox(height: 10),
-                  ],
-                ),
-              )),
-        )
-      ],
-    );
+                      Text(
+                        "Sports Board IITG",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Color(0XFFD3C48D),
+                          fontSize: 20,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Developed By: Varenya Tiwari, Karan Jain, Ayush Raj, Aayush Sachdeva",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            color: Color(0X90D3C48D),
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic),
+                      ),
+                      SizedBox(height: 10),
+                    ],
+                  ),
+                )),
+          )
+        ],
+      );
+    }
+    else{
+      return NotFoundPage();
+    }
   }
 
   Future<void> updateMembersCount(){

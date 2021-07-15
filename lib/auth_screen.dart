@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sports_web/adminLogin.dart';
+import 'package:sports_web/sharedPreference.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key key}) : super(key: key);
@@ -15,6 +16,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   String _keypassword;
   String pass;
+  String eOrMess = "";
   void getauthenticated() async{
     DocumentSnapshot ds = await FirebaseFirestore.instance.collection("authenticationKey").doc('admin').get();
     setState(() {
@@ -130,9 +132,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    const Text("Entry key for Admin or Secy portal", style: TextStyle(
+                    eOrMess == ""? Text("Entry key for Admin or Secy portal", style: TextStyle(
                       fontSize: 16,
                       color: Colors.white
+                    ),): Text(eOrMess, style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.red
                     ),),
                     SizedBox(
                       height: 10,
@@ -161,14 +166,22 @@ class _AuthScreenState extends State<AuthScreen> {
                         onPressed: () async {
                           try {
                             if(_keypassword == pass){
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>AdminLogin()));
+                              setState(() {
+                                HelperFunctions.saveAdminAuthSharedPreference(true);
+                              });
+
+                              Navigator.pushReplacementNamed(context, 'admin');
                             }
                             // if(_keypassword == "seCy"){
                             //   Navigator.pushNamed(context, 'secy');
                             // }
-
+                            else{
+                              setState(() {
+                                eOrMess = "Permission Denied !!!";
+                              });
+                            }
                           } catch (e) {
-                            print(e);
+
                           }
                         },
                       ),
