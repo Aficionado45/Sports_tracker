@@ -4,18 +4,18 @@ import 'package:sports_web/ClubListScreen.dart';
 import 'package:sports_web/addUsers.dart';
 import 'package:sports_web/adminLogin.dart';
 import 'package:sports_web/auth_screen.dart';
-import 'package:sports_web/clubsVideo.dart';
-import 'package:sports_web/errorPage.dart';
 import 'package:sports_web/home_screen.dart';
 import 'package:sports_web/reset.dart';
 import 'package:sports_web/sharedPreference.dart';
 import 'login_screen.dart';
 import 'leaderboard.dart';
 import 'reset.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Future.delayed(Duration(seconds: 1));
+  await firebase_core.Firebase.initializeApp();
   await Firebase.initializeApp();
   runApp(MyApp());
 }
@@ -60,7 +60,9 @@ class _MyAppState extends State<MyApp> {
   }
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: isLoggedIn? isUserAdmin? 'clubList':'home': 'login',
+      debugShowCheckedModeBanner: false,
+        title: "IIT Fitness Tracker",
+       initialRoute: isLoggedIn? isUserAdmin? 'clubList':'home': 'login',
       routes: {
         //Add all the page navigation refrences here to navigate across screens.
         'login': (context) => Login(),
@@ -72,7 +74,7 @@ class _MyAppState extends State<MyApp> {
 
         'clubList':(context)=>ClubListScreen(),
        'register':(context)=>AddUsers(),
-        //'clubsvideo':(context)=> ClubsVideo(),
+        // 'clubsvideo':(context)=> ClubsVideo(clubName: "Aquatics",),
       },
     );
   }
