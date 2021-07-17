@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:sports_web/ClubListScreen.dart';
+import 'package:sports_web/SecyListScreen.dart';
 import 'package:sports_web/addUsers.dart';
 import 'package:sports_web/adminLogin.dart';
 import 'package:sports_web/auth_screen.dart';
@@ -11,6 +12,7 @@ import 'login_screen.dart';
 import 'leaderboard.dart';
 import 'reset.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:sports_web/SecyLogin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,19 +63,20 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-        title: "IIT Fitness Tracker",
-       initialRoute: isLoggedIn? isUserAdmin? 'clubList':'home': 'admin',
+      title: "IIT Fitness Tracker",
+      initialRoute: isLoggedIn? isUserAdmin? 'clubList':'home': 'login',
       routes: {
-        //Add all the page navigation refrences here to navigate across screens.
+        //Add all the page navigation references here to navigate across screens.
         'login': (context) => Login(),
         'home': (context) => Home(),
         'leader': (context) => Leaderboard(),
         'reset': (context) => ResetScreen(),
         'auth':(context) => AuthScreen(),
         'admin':(context) => AdminLogin(),
-
+        'secy' : (context) => SecyLogin(),
         'clubList':(context)=>ClubListScreen(),
-       'register':(context)=>AddUsers(),
+        'secylist' : (context)=> SecyListScreen(),
+        'register':(context)=>AddUsers(),
         // 'clubsvideo':(context)=> ClubsVideo(clubName: "Aquatics",),
       },
     );

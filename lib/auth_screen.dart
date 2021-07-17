@@ -16,11 +16,14 @@ class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   String _keypassword;
   String pass;
+  String secy;
   String eOrMess = "";
   void getauthenticated() async{
     DocumentSnapshot ds = await FirebaseFirestore.instance.collection("authenticationKey").doc('admin').get();
+    DocumentSnapshot ss = await FirebaseFirestore.instance.collection("authenticationKey").doc('secy').get();
     setState(() {
       pass = ds.get('admin');
+      secy = ss.get('secy');
     });
   }
 
@@ -44,13 +47,13 @@ class _AuthScreenState extends State<AuthScreen> {
           decoration: new BoxDecoration(
               gradient: new LinearGradient(
                   colors: [
-                Color.fromRGBO(70, 75, 75, 88),
-                Color.fromRGBO(0, 0, 0, 100),
-              ],
+                    Color.fromRGBO(70, 75, 75, 88),
+                    Color.fromRGBO(0, 0, 0, 100),
+                  ],
                   stops: [
-                0.0,
-                1.0
-              ],
+                    0.0,
+                    1.0
+                  ],
                   begin: FractionalOffset.topCenter,
                   end: FractionalOffset.bottomCenter,
                   tileMode: TileMode.repeated)),
@@ -117,11 +120,11 @@ class _AuthScreenState extends State<AuthScreen> {
                         decoration: InputDecoration(
                           hintText: 'Enter key',
                           hintStyle:
-                              TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
+                          TextStyle(color: Color(0XFFBDBDBD), fontSize: 16),
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding:
-                              EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                          EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
                           border: OutlineInputBorder(
                               borderSide: BorderSide(color: Color(0xFFE8E8E8)),
                               borderRadius: BorderRadius.circular(10.0)),
@@ -133,8 +136,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       height: 10,
                     ),
                     eOrMess == ""? Text("Entry key for Admin or Secy portal", style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white
+                        fontSize: 16,
+                        color: Colors.white
                     ),): Text(eOrMess, style: TextStyle(
                         fontSize: 16,
                         color: Colors.red
@@ -157,11 +160,11 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ],
                               ),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(100.0))),
+                              BorderRadius.all(Radius.circular(100.0))),
                           padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                           child: const Text('Next',
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 16)),
+                              TextStyle(color: Colors.white, fontSize: 16)),
                         ),
                         onPressed: () async {
                           try {
@@ -172,9 +175,13 @@ class _AuthScreenState extends State<AuthScreen> {
 
                               Navigator.pushReplacementNamed(context, 'admin');
                             }
-                            // if(_keypassword == "seCy"){
-                            //   Navigator.pushNamed(context, 'secy');
-                            // }
+                            if(_keypassword == secy){
+                              setState(() {
+                                HelperFunctions.saveAdminAuthSharedPreference(true);
+                              });
+
+                              Navigator.pushReplacementNamed(context, 'secy');
+                            }
                             else{
                               setState(() {
                                 eOrMess = "Permission Denied !!!";
@@ -216,5 +223,5 @@ class _AuthScreenState extends State<AuthScreen> {
       ],
     );
   }
-  
+
 }
