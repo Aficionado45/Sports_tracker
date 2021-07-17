@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
         title: "IIT Fitness Tracker",
-       initialRoute: isLoggedIn? isUserAdmin? 'clubList':'home': 'login',
+       initialRoute: isLoggedIn? isUserAdmin? 'clubList':'home': 'admin',
       routes: {
         //Add all the page navigation refrences here to navigate across screens.
         'login': (context) => Login(),
